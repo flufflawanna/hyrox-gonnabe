@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hyrox Gonnabe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column — countdown hero, two tabs (Calendar | Times) so only one job is on screen at a time */
+:root{
+  --bg:#eef0f3; --surface:#ffffff; --ink:#15181d; --muted:#5d6672; --line:#d6dae1; --soft:#f5f6f8;
+  --accent:#15181d; --hero:#15181d; --hero-ink:#f4f5f7; --hero-muted:#a9b0ba; --yellow:#f5c400;
+  --good:#1f8a4c; --good-bg:#dff3e6; --warn:#a86500; --warn-bg:#fdf0d5; --bad:#c4302b; --bad-bg:#fbe1df;
+  --p-joanna:#2563eb; --p-christie:#e8590c; --p-avelyn:#a21caf; --p-lydia:#0f9488;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111418; --surface:#1a1e24; --ink:#eef1f5; --muted:#9aa3ae; --line:#2c323b; --soft:#20252c;
+  --accent:#eef1f5; --hero:#000000; --hero-ink:#f4f5f7; --hero-muted:#a9b0ba; --yellow:#f5c400;
+  --good:#5fd08c; --good-bg:#16301f; --warn:#f2b347; --warn-bg:#33270f; --bad:#ff7a72; --bad-bg:#3a1a19;
+  --p-joanna:#5b8cff; --p-christie:#ff7f3f; --p-avelyn:#d65ae0; --p-lydia:#2fc3b4;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111418; --surface:#1a1e24; --ink:#eef1f5; --muted:#9aa3ae; --line:#2c323b; --soft:#20252c;
+  --accent:#eef1f5; --hero:#000000; --hero-ink:#f4f5f7; --hero-muted:#a9b0ba; --yellow:#f5c400;
+  --good:#5fd08c; --good-bg:#16301f; --warn:#f2b347; --warn-bg:#33270f; --bad:#ff7a72; --bad-bg:#3a1a19;
+  --p-joanna:#5b8cff; --p-christie:#ff7f3f; --p-avelyn:#d65ae0; --p-lydia:#2fc3b4;
+  color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:32px}
+h1,h2,h3{font-family:var(--display);font-weight:800;text-transform:uppercase;margin:0;text-wrap:balance}
+h2{font-size:26px;letter-spacing:.03em}
+h3{font-size:15px;letter-spacing:.1em;color:var(--muted);font-weight:600}
+p{margin:0}
+[hidden]{display:none!important}
+.hint{color:var(--muted);font-size:14px}
+section{display:flex;flex-direction:column;gap:14px}
+button{font-family:var(--body)}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--p-joanna);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* hero */
+.hero{background:var(--hero);color:var(--hero-ink);border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+.team{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(34px,9vw,52px);line-height:.9}
+.team span{color:var(--yellow)}
+.race-line{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:13px;color:var(--hero-muted);margin-top:6px}
+.cd{text-align:right;flex:none}
+.cd b{display:block;font-family:var(--display);font-weight:800;font-size:clamp(56px,16vw,84px);line-height:.85;color:var(--yellow);font-variant-numeric:tabular-nums}
+.cd span{font-family:var(--display);font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:13px;color:var(--hero-muted)}
+.msg{font-size:18px;line-height:1.4;font-weight:500;max-width:56ch;border-top:1px solid #ffffff22;padding-top:12px}
+
+/* tabs */
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.tab{font:800 18px var(--display);text-transform:uppercase;letter-spacing:.06em;border:0;border-radius:9px;padding:10px;background:transparent;color:var(--muted);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--bg)}
+
+.pd{display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--c);flex:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chips .lbl{font:600 14px var(--display);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-right:2px}
+.chip{display:inline-flex;align-items:center;gap:7px;font:600 15px var(--body);padding:6px 13px 6px 9px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--c);background:var(--c);color:#fff}
+.chip[aria-pressed="true"] .pd{background:#fff}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.lg{width:12px;height:12px;border-radius:50%;display:inline-block;box-sizing:border-box}
+.lg.free{background:var(--muted)} .lg.maybe{border:2.5px solid var(--muted)} .lg.out{border:1.5px dashed var(--muted);opacity:.6}
+
+/* calendar */
+.months{display:flex;flex-direction:column;gap:16px}
+.month{display:flex;flex-direction:column;gap:6px}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.dow{font:600 12px var(--display);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:center}
+.cell{aspect-ratio:1/1;max-width:100%;min-width:0;border-radius:8px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:space-evenly;padding:3px;cursor:pointer;font:600 14px var(--body);font-variant-numeric:tabular-nums}
+.cell.we{background:var(--soft)}
+.cell.all{border-color:var(--good);box-shadow:inset 0 0 0 1.5px var(--good)}
+.cell.blank{visibility:hidden}
+.cell.na{background:transparent;border-color:transparent;color:var(--muted);opacity:.4;cursor:default}
+.cell.race{background:var(--yellow);border-color:var(--yellow);color:#15181d;cursor:default;font-family:var(--display);font-weight:800}
+.cell.race small{font-size:11px;letter-spacing:.08em}
+.cell[aria-pressed="true"]{outline:3px solid var(--ink);outline-offset:1px}
+.dots{display:grid;grid-template-columns:repeat(2,auto);gap:3px}
+.dot{width:11px;height:11px;border-radius:50%;box-sizing:border-box}
+.dot.free{background:var(--c)}
+.dot.maybe{border:2.5px solid var(--c)}
+.dot.out{border:1.5px dashed var(--muted);opacity:.45}
+@media (min-width:560px){.dot{width:13px;height:13px}.cell{font-size:15px}}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.detail h3{color:var(--ink);font-size:17px;letter-spacing:.06em}
+.drow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.drow .nm{display:inline-flex;align-items:center;gap:8px}
+.pill{font:600 12px var(--display);text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:4px;white-space:nowrap}
+.pill.free{background:var(--good-bg);color:var(--good)} .pill.maybe{background:var(--warn-bg);color:var(--warn)} .pill.out{background:var(--bad);color:var(--surface)}
+.status{font-size:14px;color:var(--muted);min-height:1.2em}
+
+/* times */
+.big{background:var(--hero);color:var(--hero-ink);border-radius:12px;padding:16px 20px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.big h3{color:var(--hero-muted)}
+.big b{display:block;font-family:var(--display);font-weight:800;font-size:52px;line-height:1;color:var(--yellow);font-variant-numeric:tabular-nums}
+.big .goal{text-align:right;color:var(--hero-muted);font-size:14px}
+.big .goal b{font-size:28px;color:var(--hero-ink)}
+.btn{font:600 16px var(--body);padding:12px 16px;border-radius:10px;border:0;background:var(--ink);color:var(--bg);cursor:pointer}
+.btn.wide{width:100%;font:800 18px var(--display);text-transform:uppercase;letter-spacing:.06em}
+.logbox{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.logbox .full{grid-column:1/-1}
+label{display:flex;flex-direction:column;gap:4px;font:600 13px var(--display);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);min-width:0}
+input,select{font:17px var(--body);padding:10px;border-radius:8px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);min-width:0;width:100%;box-sizing:border-box}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.st{border-bottom:1px solid var(--line)}
+.st:last-child{border-bottom:0}
+.st summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:6px 1fr auto;gap:12px;align-items:center;padding:12px 14px 12px 0}
+.st summary::-webkit-details-marker{display:none}
+.bar{align-self:stretch;background:var(--c);border-radius:0 3px 3px 0}
+.st-name{font:800 19px var(--display);text-transform:uppercase;letter-spacing:.02em;line-height:1.1}
+.st-sub{font-size:13px;color:var(--muted)}
+.st-best{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.st-best small{display:block;font-size:12px;font-weight:500;color:var(--good)}
+.st-body{padding:0 14px 14px 18px;display:flex;flex-direction:column;gap:8px}
+.arow{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:14px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.arow .v{color:var(--ink)}
+.pb{font:600 11px var(--display);letter-spacing:.08em;background:var(--yellow);color:#15181d;padding:1px 6px;border-radius:3px;margin-left:6px}
+.x{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:13px;padding:4px 6px;border-radius:4px}
+.x.confirm{background:var(--bad);color:var(--surface)}
+.goalrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;border-top:1px solid var(--line);padding-top:10px}
+.goalrow input{font-size:16px;padding:8px}
+.goalrow .btn{padding:9px 14px;font-size:15px}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="team">Hyrox<br><span>Gonnabe</span></div>
+        <div class="race-line">Race day · Sat 12 Dec</div>
+      </div>
+      <div class="cd"><b id="days">–</b><span id="daysLabel">days to go</span></div>
+    </div>
+    <p class="msg" id="msg">…</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tabCal" aria-selected="true" aria-controls="calView">Calendar</button>
+    <button class="tab" role="tab" id="tabTimes" aria-selected="false" aria-controls="timesView">Times</button>
+  </div>
+
+  <section id="calView" role="tabpanel" aria-labelledby="tabCal">
+    <div class="chips" id="who"></div>
+    <div class="legend"><span><i class="lg free"></i>Free</span><span><i class="lg maybe"></i>Maybe</span><span><i class="lg out"></i>Can't</span></div>
+    <p class="status" id="calStatus" aria-live="polite">Tap your name, then tap days you can't make.</p>
+    <div class="months" id="cal"></div>
+    <div class="detail" id="detail" hidden></div>
+  </section>
+
+  <section id="timesView" role="tabpanel" aria-labelledby="tabTimes" hidden>
+    <div class="big" id="proj"></div>
+    <button class="btn wide" type="button" id="openLog">+ Log a time</button>
+    <form class="logbox" id="addLog" hidden>
+      <label class="full">Station<select id="fStation"></select></label>
+      <label>Run /km<input id="fPace" inputmode="decimal" placeholder="7:30"></label>
+      <label>Station<input id="fTime" inputmode="decimal" placeholder="6:20"></label>
+      <button class="btn full" type="submit">Save</button>
+      <span class="status full" id="logStatus" aria-live="polite"></span>
+    </form>
+    <div class="legend" style="justify-content:space-between"><span>Station</span><span>Best run /km · station</span></div>
+    <div class="list" id="stations" style="margin-top:-8px"></div>
+  </section>
+</div>
+
+<script>
+const TEAM = "Hyrox Gonnabe";
+const PEOPLE = [
+  { id: "joanna", name: "Joanna" }, { id: "christie", name: "Christie" },
+  { id: "avelyn", name: "Avelyn" }, { id: "lydia", name: "Lydia" } ];
+const PCOL = id => `var(--p-${id})`;
+const STATIONS = [
+  { id: "ski", n: 1, name: "SkiErg", dist: "1000m", who: "joanna" },
+  { id: "push", n: 2, name: "Sled push", dist: "50m", who: "christie" },
+  { id: "pull", n: 3, name: "Sled pull", dist: "50m", who: "avelyn" },
+  { id: "bbj", n: 4, name: "Burpee broad jumps", dist: "80m", who: "joanna" },
+  { id: "row", n: 5, name: "Row", dist: "1000m", who: "lydia" },
+  { id: "farmers", n: 6, name: "Farmers carry", dist: "200m", who: "christie" },
+  { id: "lunges", n: 7, name: "Lunges", dist: "100m", who: "lydia" },
+  { id: "wallballs", n: 8, name: "Wall balls", dist: "100 reps", who: "avelyn" } ];
+const ROXZONE = 7 * 60; // assumed total transition time
+
+const RACE = new Date(2026, 11, 12);
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+const FIRST = new Date(Math.max(TODAY, new Date(2026, 9, 20)));
+const key = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const fromKey = k => { const [y,m,d] = k.split("-").map(Number); return new Date(y, m-1, d); };
+const fmt = (d, o) => d.toLocaleDateString("en-GB", o);
+const isWE = d => d.getDay() === 0 || d.getDay() === 6;
+const inRange = d => d >= FIRST && d < RACE;
+const NEXT = { free: "out", out: "maybe", maybe: "free" };
+const LABEL = { free: "Free", maybe: "Maybe", out: "Can't" };
+const MONTHS = []; for (let m = new Date(FIRST.getFullYear(), FIRST.getMonth(), 1); m <= RACE; m = new Date(m.getFullYear(), m.getMonth()+1, 1)) MONTHS.push(m);
+const DAYS_LEFT = Math.round((RACE - TODAY) / 864e5);
+const pname = id => (PEOPLE.find(p => p.id === id) || { name: "?" }).name;
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+
+// time helpers: "7:30", "7.30", "10" (=10:00), "1:02:30"
+function parseT(s){
+  s = String(s || "").trim(); if (!s) return null;
+  const parts = s.split(/[:.]/);
+  if (parts.some(p => !/^\d+$/.test(p))) return NaN;
+  if (parts.length === 1) return +parts[0] * 60;
+  if (parts.length === 2) { let sec = parts[1]; if (sec.length === 1) sec += "0"; return +parts[0] * 60 + +sec; }
+  if (parts.length === 3) return +parts[0] * 3600 + +parts[1] * 60 + +parts[2];
+  return NaN;
+}
+function fmtT(t){ if (t == null || isNaN(t)) return "–"; t = Math.round(t);
+  const h = Math.floor(t / 3600), m = Math.floor(t % 3600 / 60), s = t % 60;
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}` : `${m}:${String(s).padStart(2,"0")}`; }
+
+let db = null, avail = {}, stationCfg = {}, logs = [], me = null, pending = {}, timer = null, selected = null;
+try { me = localStorage.getItem("gonnabe-me"); if (!PEOPLE.some(p => p.id === me)) me = null; } catch (e) {}
+
+/* ---------- availability ---------- */
+const statusOf = (pid, k) => (pid === me && pending[k]) || (avail[pid] && avail[pid].dates && avail[pid].dates[k]) || "free";
+const calSay = t => { document.getElementById("calStatus").textContent = t; };
+
+function renderWho(){
+  const box = document.getElementById("who"); box.textContent = "";
+  box.append(el("span", "lbl", "I'm"));
+  PEOPLE.forEach(p => { const b = el("button", "chip"); b.type = "button"; b.style.setProperty("--c", PCOL(p.id));
+    const d = el("span", "pd"); d.style.setProperty("--c", PCOL(p.id)); b.append(d, p.name);
+    b.setAttribute("aria-pressed", p.id === me ? "true" : "false");
+    b.onclick = () => { if (timer) { clearTimeout(timer); flush(); }
+      me = me === p.id ? null : p.id; pending = {}; try { me ? localStorage.setItem("gonnabe-me", me) : localStorage.removeItem("gonnabe-me"); } catch (e) {}
+      calSay(me ? `Tap a day you can't make. Tap again for Maybe, again to clear.` : "Tap your name, then tap days you can't make.");
+      renderWho(); };
+    box.append(b); });
+}
+
+function renderCal(){
+  const box = document.getElementById("cal"); box.textContent = "";
+  MONTHS.forEach(m => {
+    const wrap = el("div", "month"); wrap.append(el("h3", null, fmt(m, { month: "long" })));
+    const g = el("div", "cal");
+    ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].forEach((n, i) => g.append(el("div", "dow" + (i > 4 ? " we" : ""), n)));
+    const same = m.getFullYear() === FIRST.getFullYear() && m.getMonth() === FIRST.getMonth();
+    const start = same ? Math.max(1, FIRST.getDate() - ((FIRST.getDay() + 6) % 7)) : 1;
+    const lead = start === 1 ? (m.getDay() + 6) % 7 : 0;
+    for (let i = 0; i < lead; i++) g.append(el("div", "cell blank"));
+    const end = new Date(m.getFullYear(), m.getMonth()+1, 0).getDate();
+    for (let day = start; day <= end; day++) {
+      const d = new Date(m.getFullYear(), m.getMonth(), day); if (d > RACE) break;
+      const b = el("button", "cell" + (isWE(d) ? " we" : "")); b.type = "button";
+      b.append(el("span", null, day));
+      if (+d === +RACE) { b.className = "cell race"; b.append(el("small", null, "RACE")); b.disabled = true; }
+      else if (!inRange(d)) { b.className = "cell na"; b.disabled = true; }
+      else {
+        const k = key(d), dots = el("div", "dots"); let free = 0;
+        PEOPLE.forEach(p => { const s = statusOf(p.id, k); if (s === "free") free++;
+          const dt = el("span", "dot " + s); dt.style.setProperty("--c", PCOL(p.id)); dots.append(dt); });
+        b.append(dots);
+        if (free === PEOPLE.length && anyFilled()) b.classList.add("all");
+        b.setAttribute("aria-pressed", selected === k ? "true" : "false");
+        b.setAttribute("aria-label", `${fmt(d, { weekday: "long", day: "numeric", month: "long" })}: ${PEOPLE.map(p => p.name + " " + LABEL[statusOf(p.id, k)]).join(", ")}`);
+        b.onclick = () => { selected = k; if (me) mark(k); else { renderCal(); renderDetail(); } };
+      }
+      g.append(b);
+    }
+    wrap.append(g); box.append(wrap);
+  });
+}
+const anyFilled = () => PEOPLE.some(p => avail[p.id] && avail[p.id].dates && Object.keys(avail[p.id].dates).length);
+
+function renderDetail(){
+  const box = document.getElementById("detail"); box.textContent = "";
+  box.hidden = !selected; if (!selected) return;
+  const d = fromKey(selected);
+  box.append(el("h3", null, fmt(d, { weekday: "long", day: "numeric", month: "long" }) + (isWE(d) ? " · whole day" : " · evening")));
+  PEOPLE.forEach(p => { const s = statusOf(p.id, selected); const r = el("div", "drow"); const n = el("span", "nm");
+    const dt = el("span", "pd"); dt.style.setProperty("--c", PCOL(p.id)); n.append(dt, p.name);
+    r.append(n, el("span", "pill " + s, LABEL[s])); box.append(r); });
+}
+
+function mark(k){
+  if (!db) { calSay("Can't reach the shared calendar right now."); return; }
+  pending[k] = NEXT[statusOf(me, k)];
+  renderCal(); renderDetail(); calSay("Saving…");
+  clearTimeout(timer); timer = setTimeout(flush, 600);
+}
+let writing = false;
+async function flush(){
+  timer = null;
+  if (writing) { timer = setTimeout(flush, 300); return; }
+  if (!me || !Object.keys(pending).length) return;
+  const who = me, sent = { ...pending };
+  const dates = { ...((avail[who] && avail[who].dates) || {}), ...sent };
+  Object.keys(dates).forEach(k => { if (dates[k] === "free") delete dates[k]; });
+  writing = true;
+  try {
+    await db.collection("people").doc(who).set({ name: pname(who), dates, updated: new Date().toISOString() });
+    avail[who] = { ...(avail[who] || {}), dates };
+    Object.keys(sent).forEach(k => { if (pending[k] === sent[k]) delete pending[k]; });
+    calSay("Saved ✓");
+  } catch (e) {
+    calSay(e && e.code === "invalid_argument" ? "Couldn't save. Check your connection and tap again." : "Couldn't save. Check your connection and tap again.");
+    pending = {}; renderCal(); renderDetail();
+  } finally { writing = false; }
+}
+
+/* ---------- benchmarks ---------- */
+const cfg = s => ({ who: s.who, load: "", goalPace: null, goalTime: null, goalNote: "", ...(stationCfg[s.id] || {}) });
+const logsFor = id => logs.filter(l => l.station === id);
+const total = l => (l.pace != null && l.time != null) ? l.pace + l.time : null;
+function bestOf(id){
+  const ls = logsFor(id); if (!ls.length) return null;
+  const withBoth = ls.filter(l => total(l) != null);
+  if (withBoth.length) return withBoth.reduce((a, b) => total(b) < total(a) ? b : a);
+  return null;
+}
+const minOf = (ls, f) => { const v = ls.map(f).filter(x => x != null); return v.length ? Math.min(...v) : null; };
+
+function projection(){
+  let sum = 0, goal = 0, missing = [];
+  STATIONS.forEach(s => { const b = bestOf(s.id), c = cfg(s);
+    if (!b) { missing.push(s.name); return; }
+    sum += total(b);
+    goal += (c.goalPace != null ? Math.min(c.goalPace, b.pace) : b.pace) + (c.goalTime != null ? Math.min(c.goalTime, b.time) : b.time); });
+  return { now: missing.length ? null : sum + ROXZONE, goal: missing.length ? null : goal + ROXZONE, missing };
+}
+function biggestGain(){
+  let best = null;
+  STATIONS.forEach(s => { const ls = logsFor(s.id).filter(l => total(l) != null); if (ls.length < 2) return;
+    const first = total(ls[0]), b = total(bestOf(s.id)); const gain = first - b;
+    if (gain > 0 && (!best || gain > best.gain)) best = { s, who: cfg(s).who, first, b, gain }; });
+  return best;
+}
+
+function renderProj(){
+  const box = document.getElementById("proj"); box.textContent = "";
+  const p = projection();
+  const l = el("div"); l.append(el("h3", null, "Team time"), el("b", null, p.now ? fmtT(p.now) : "–"));
+  box.append(l);
+  if (p.goal && p.now && p.goal < p.now) { const g = el("div", "goal"); g.append("Goal", el("b", null, fmtT(p.goal))); box.append(g); }
+}
+
+function renderStations(){
+  const box = document.getElementById("stations");
+  const open = new Set([...box.querySelectorAll("details[open]")].map(d => d.dataset.id));
+  box.textContent = "";
+  STATIONS.forEach(s => {
+    const c = cfg(s), ls = logsFor(s.id), best = bestOf(s.id);
+    const d = el("details", "st"); d.dataset.id = s.id; d.style.setProperty("--c", PCOL(c.who)); if (open.has(s.id)) d.open = true;
+    const sum = el("summary"); sum.append(el("span", "bar"));
+    const t = el("div"); t.append(el("div", "st-name", `${s.n}. ${s.name}`), el("div", "st-sub", pname(c.who) + (c.load ? " · " + c.load : "")));
+    const r = el("div", "st-best"); r.append(best ? `${fmtT(best.pace)} · ${fmtT(best.time)}` : "–");
+    const goal = [c.goalPace != null ? fmtT(c.goalPace) : "", c.goalTime != null ? fmtT(c.goalTime) : ""].filter(Boolean).join(" · ") || c.goalNote;
+    if (goal) r.append(el("small", null, "Goal " + goal));
+    sum.append(t, r); d.append(sum);
+
+    const body = el("div", "st-body");
+    if (!ls.length) body.append(el("p", "status", "No times yet."));
+    ls.slice().reverse().forEach(l => { const row = el("div", "arow");
+      const left = el("span"); left.append(l.date ? fmt(fromKey(l.date), { day: "numeric", month: "short" }) : "Earlier", "  ");
+      const v = el("span", "v", `${l.pace != null ? fmtT(l.pace) : "–"} · ${l.time != null ? fmtT(l.time) : "–"}`); left.append(v);
+      if (best && l.id === best.id && ls.length > 1) left.append(el("span", "pb", "PB"));
+      const x = el("button", "x", "✕"); x.type = "button"; x.setAttribute("aria-label", "Delete this time");
+      x.onclick = async () => { if (!x.classList.contains("confirm")) { x.classList.add("confirm"); x.textContent = "Delete?"; setTimeout(() => { x.classList.remove("confirm"); x.textContent = "✕"; }, 3000); return; }
+        try { await db.collection("logs").doc(l.id).delete(); } catch (e) { x.textContent = "Failed"; } };
+      row.append(left, x); body.append(row); });
+
+    const gf = el("form", "goalrow");
+    const mk = (lbl, id, val, ph) => { const L = el("label", null, lbl); const i = el("input"); i.id = id; i.value = val; i.placeholder = ph; i.inputMode = "decimal"; L.append(i); return [L, i]; };
+    const [l1, iP] = mk("Goal run", `gp-${s.id}`, c.goalPace != null ? fmtT(c.goalPace) : "", "6:00");
+    const [l2, iT] = mk("Goal station", `gt-${s.id}`, c.goalTime != null ? fmtT(c.goalTime) : "", "2:00");
+    const sb = el("button", "btn", "Set"); sb.type = "submit";
+    gf.append(l1, l2, sb);
+    gf.onsubmit = async ev => { ev.preventDefault();
+      const gp = parseT(iP.value), gt = parseT(iT.value);
+      if (Number.isNaN(gp) || Number.isNaN(gt)) { sb.textContent = "Use 6:00"; return; }
+      try { await db.collection("stations").doc(s.id).set({ ...cfg(s), goalPace: gp, goalTime: gt }); sb.textContent = "✓"; }
+      catch (e) { sb.textContent = "Failed"; } };
+    body.append(gf); d.append(body); box.append(d);
+  });
+}
+
+function setupForm(){
+  const st = document.getElementById("fStation"), keep = st.value;
+  st.textContent = ""; STATIONS.forEach(s => { const o = el("option", null, `${s.name} · ${pname(cfg(s).who)}`); o.value = s.id; st.append(o); });
+  if (keep) st.value = keep;
+  else { const mine = STATIONS.find(s => cfg(s).who === me); if (mine) st.value = mine.id; }
+}
+document.getElementById("openLog").onclick = () => { const f = document.getElementById("addLog"); f.hidden = !f.hidden;
+  document.getElementById("openLog").textContent = f.hidden ? "+ Log a time" : "Close"; if (!f.hidden) document.getElementById("fPace").focus(); };
+document.getElementById("addLog").addEventListener("submit", async ev => {
+  ev.preventDefault();
+  const out = document.getElementById("logStatus");
+  const pace = parseT(document.getElementById("fPace").value), time = parseT(document.getElementById("fTime").value);
+  if (Number.isNaN(pace) || Number.isNaN(time)) { out.textContent = "Type times like 7:30."; return; }
+  if (pace == null && time == null) { out.textContent = "Add at least one time."; return; }
+  if (!db) { out.textContent = "Can't connect right now."; return; }
+  const sid = document.getElementById("fStation").value;
+  const data = { station: sid, who: cfg(STATIONS.find(s => s.id === sid)).who, date: key(new Date()), pace, time, note: "", created: new Date().toISOString() };
+  try { await db.collection("logs").add(data); out.textContent = "Saved ✓";
+    ["fPace","fTime"].forEach(id => document.getElementById(id).value = ""); }
+  catch (e) { out.textContent = "Couldn't save. Try again."; }
+});
+
+/* tabs */
+function showTab(t){
+  const cal = t !== "times";
+  document.getElementById("tabCal").setAttribute("aria-selected", cal); document.getElementById("tabTimes").setAttribute("aria-selected", !cal);
+  document.getElementById("calView").hidden = !cal; document.getElementById("timesView").hidden = cal;
+  try { localStorage.setItem("gonnabe-tab", t); } catch (e) {}
+}
+document.getElementById("tabCal").onclick = () => showTab("cal");
+document.getElementById("tabTimes").onclick = () => showTab("times");
+try { showTab(location.hash === "#times" ? "times" : localStorage.getItem("gonnabe-tab") || "cal"); } catch (e) { showTab("cal"); }
+
+/* ---------- countdown + daily message ---------- */
+function nextAllFree(){
+  if (!PEOPLE.every(p => avail[p.id] && avail[p.id].dates && Object.keys(avail[p.id].dates).length)) return null;
+  for (let d = new Date(TODAY.getTime() + 864e5); d < RACE; d.setDate(d.getDate() + 1)) if (isWE(d) && PEOPLE.every(p => statusOf(p.id, key(d)) === "free")) return new Date(d);
+  return null;
+}
+function dailyMessage(){
+  const n = DAYS_LEFT, J = "Joanna", C = "Christie", A = "Avelyn", L = "Lydia";
+  if (n < 0) return "It's done. You're not Gonnabes any more. You're Hyrox finishers.";
+  const special = {
+    0: "Race day. Eight runs, eight stations, four of you. Go get it, Hyrox Gonnabe.",
+    1: "Tomorrow. Lay out your kit, pin your number, eat a proper dinner, sleep early.",
+    2: "Two days. Short shakeout only. Nothing new: no new shoes, no new food.",
+    3: "Three days. The hard work is done. Rest is part of the plan now.",
+    7: "Race week. Taper, sleep, hydrate. Trust the training you've banked.",
+    10: "Ten days. One last solid session this weekend, then start easing off.",
+    14: "Two weeks out. Run through the race order together once: who's up after who, where you hand over.",
+    21: "Three weeks. This is the last big block. Make the next 7 days count.",
+    30: `30 days. ${J}, ${C}, ${A}, ${L}: four people, one finish line, one month to sharpen.`,
+    50: "50 days. Plenty of time to get faster. Not enough time to waste a week."
+  };
+  if (special[n]) return special[n];
+  const p = projection(), g = biggestGain(), nf = nextAllFree();
+  const dynamic = [];
+  if (p.now) dynamic.push(`Projected team time right now: ${fmtT(p.now)}. ${p.now < 7200 ? "That's already under 2 hours. Protect it." : `${fmtT(p.now - 7200)} to find for sub-2. Every PB chips at it.`}`);
+  if (g) dynamic.push(`${pname(g.who)} has taken ${fmtT(g.gain)} off ${g.s.name.toLowerCase()} since the first try. That's what showing up does.`);
+  if (nf) dynamic.push(`Next weekend day all four of you are free: ${fmt(nf, { weekday: "long", day: "numeric", month: "short" })}. Lock it in.`);
+  const fixed = [
+    `${J} opens the race on the SkiErg and comes back for the burpee broad jumps. Long, steady pulls today, and breathe out on every burpee.`,
+    `${C} owns the heavy stuff: sled push and farmers carry. Low hips, short fast steps. Eat properly today, heavy days need fuel.`,
+    `${A} has sled pull and finishes on wall balls. 100 unbroken is the goal. Every set you do this week counts toward it.`,
+    `${L} has the row and the lunges. The lunges are the longest station. Practise staying patient when your legs burn.`,
+    "Ten seconds off your km pace is 80 seconds off the team time. Eight runs add up.",
+    "Hyrox is compromised running. Today, do a run straight after something hard.",
+    "Roxzone is where minutes go missing. Practise moving fast between exercises.",
+    "Log it or it didn't happen. Add today's times in the Times tab.",
+    "Sleep is training. Lights out early tonight, Gonnabes.",
+    "Grip work today: dead hangs, carries, squeezes. Your sled pull and farmers carry will thank you.",
+    "Mobility check: hips for the lunges, shoulders for the wall balls, back for the sled.",
+    "Rest day? Rest properly. You get fitter while you recover.",
+    "Rough day? Show up anyway, go easy, it still counts.",
+    "Count the colours on the calendar. Four circles means a team session. Find the next one.",
+    "Hydrate before you're thirsty. Two bottles by lunch.",
+    "Practise your race-day breakfast now, not on 12 December.",
+    "In a relay nobody runs alone. Text the squad what you're doing today."
+  ];
+  const dayNo = Math.floor(TODAY.getTime() / 864e5);
+  if (dynamic.length && dayNo % 3 === 0) return dynamic[Math.floor(dayNo / 3) % dynamic.length];
+  return fixed[dayNo % fixed.length];
+}
+function renderHero(){
+  document.getElementById("days").textContent = Math.max(0, DAYS_LEFT);
+  document.getElementById("daysLabel").textContent = DAYS_LEFT === 1 ? "day to go" : DAYS_LEFT <= 0 ? (DAYS_LEFT === 0 ? "race day" : "finished") : "days to go";
+  document.getElementById("msg").textContent = dailyMessage();
+}
+
+function renderAll(){ renderHero(); renderWho(); renderCal(); renderDetail(); renderProj(); renderStations(); }
+setupForm(); renderAll();
+
+// ====== PASTE YOUR FIREBASE SETTINGS BETWEEN THE TWO LINES BELOW ======
+const firebaseConfig = {
+  apiKey: "AIzaSyAT8mwh1c4UB7aHT1rgZZEKBUyh1ok3abQ",
+  authDomain: "hyrox-gonnabe.firebaseapp.com",
+  projectId: "hyrox-gonnabe",
+  storageBucket: "hyrox-gonnabe.firebasestorage.app",
+  messagingSenderId: "560983020995",
+  appId: "1:560983020995:web:414cd6f10bf82218a45976"
+};
+// ====== END OF FIREBASE SETTINGS ======
+
+// Your benchmarks so far, loaded once into the database the first time the page opens.
+const STARTING_DATA = {"stations": {"push": {"who": "christie", "load": "102kg, 2×25m", "goalPace": null, "goalTime": null, "goalNote": ""}, "pull": {"who": "avelyn", "load": "78kg, 4×12.5m", "goalPace": 360, "goalTime": 120, "goalNote": "Below 6:00/km run, 2 min pull"}, "farmers": {"who": "christie", "load": "2×16kg", "goalPace": null, "goalTime": null, "goalNote": ""}, "lunges": {"who": "lydia", "load": "10kg", "goalPace": null, "goalTime": null, "goalNote": ""}, "wallballs": {"who": "avelyn", "load": "4kg", "goalPace": null, "goalTime": null, "goalNote": "100 unbroken"}}, "logs": [{"id": "l00", "station": "ski", "who": "joanna", "date": "", "pace": 450, "time": 380, "note": "", "created": "2026-10-20T00:00:00Z"}, {"id": "l01", "station": "push", "who": "christie", "date": "", "pace": 600, "time": 258, "note": "", "created": "2026-10-20T00:00:01Z"}, {"id": "l02", "station": "pull", "who": "avelyn", "date": "", "pace": 363, "time": 140, "note": "", "created": "2026-10-20T00:00:02Z"}, {"id": "l03", "station": "bbj", "who": "joanna", "date": "", "pace": 450, "time": 460, "note": "", "created": "2026-10-20T00:00:03Z"}, {"id": "l04", "station": "bbj", "who": "joanna", "date": "", "pace": 450, "time": 380, "note": "", "created": "2026-10-20T00:00:04Z"}, {"id": "l05", "station": "row", "who": "lydia", "date": "", "pace": 574, "time": 346, "note": "", "created": "2026-10-20T00:00:05Z"}, {"id": "l06", "station": "farmers", "who": "christie", "date": "", "pace": 600, "time": 314, "note": "", "created": "2026-10-20T00:00:06Z"}, {"id": "l07", "station": "lunges", "who": "lydia", "date": "", "pace": 546, "time": 653, "note": "", "created": "2026-10-20T00:00:07Z"}, {"id": "l08", "station": "wallballs", "who": "avelyn", "date": "", "pace": 371, "time": 305, "note": "", "created": "2026-10-20T00:00:08Z"}, {"id": "l09", "station": "wallballs", "who": "avelyn", "date": "", "pace": 400, "time": 268, "note": "", "created": "2026-10-20T00:00:09Z"}, {"id": "l10", "station": "wallballs", "who": "avelyn", "date": "", "pace": 390, "time": 290, "note": "", "created": "2026-10-20T00:00:10Z"}]};
+
+async function seedOnce(){
+  const meta = db.collection("meta").doc("seeded");
+  if ((await meta.get()).exists) return;
+  const batch = db.batch();
+  Object.entries(STARTING_DATA.stations).forEach(([id, v]) => batch.set(db.collection("stations").doc(id), v));
+  STARTING_DATA.logs.forEach(l => { const { id, ...v } = l; batch.set(db.collection("logs").doc(id), v); });
+  batch.set(meta, { at: new Date().toISOString() });
+  await batch.commit();
+}
+
+(async () => {
+  if (firebaseConfig.apiKey === "PASTE_HERE" || !window.firebase) { calSay("Setup not finished: the Firebase settings haven't been pasted in yet."); return; }
+  try { firebase.initializeApp(firebaseConfig); db = firebase.firestore(); await seedOnce(); }
+  catch (e) { db = null; calSay("Can't connect to the database. Check the Firebase settings and rules."); return; }
+  const fail = () => calSay("Lost the connection. Reload the page.");
+  db.collection("people").onSnapshot(snap => { avail = {}; snap.docs.forEach(d => avail[d.id] = d.data()); renderHero(); renderCal(); renderDetail(); }, fail);
+  db.collection("stations").onSnapshot(snap => { stationCfg = {}; snap.docs.forEach(d => stationCfg[d.id] = d.data()); setupForm(); renderAll(); }, fail);
+  db.collection("logs").onSnapshot(snap => { logs = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(a.created).localeCompare(String(b.created))); renderHero(); renderProj(); renderStations(); }, fail);
+})();
+</script>
+</body>
+</html>
